@@ -1,17 +1,76 @@
-import { useState, useEffect} from "react";
+import { useEffect } from "react";
 import {
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
   Printer,
   RefreshCw,
   Building,
   Calendar,
   ClipboardList,
   Beaker,
-  Hash,
 } from "lucide-react";
 import nitclogo from "../../assets/NITC_logo.png";
+
+const ReportHeader = ({ title }) => (
+  <header className="relative mb-5 shrink-0 border-b-2 border-slate-300 pb-4">
+    <div className="absolute inset-x-0 top-0 h-1 rounded-full bg-gradient-to-r from-sky-500 via-cyan-400 to-teal-400" />
+    <div className="flex items-center justify-center gap-4 pt-1">
+      <div className="w-16 h-16 shrink-0 flex items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-white">
+        <img
+          src={nitclogo}
+          alt="NITC Logo"
+          className="w-full h-full object-contain"
+          onError={(e) => {
+            e.target.style.display = "none";
+            e.target.nextSibling.style.display = "flex";
+          }}
+        />
+        <div
+          style={{ display: "none" }}
+          className="w-16 h-16 bg-slate-900 rounded-full items-center justify-center text-white"
+        >
+          <span className="text-[8px] font-bold">NITC</span>
+        </div>
+      </div>
+
+      <div className="text-center">
+        <p className="text-[15px] font-bold uppercase tracking-[0.35em] text-sky-700">
+          Department of Civil Engineering
+        </p>
+        <h1 className="mt-2 text-[24px] font-black uppercase tracking-[0.02em] text-slate-900 leading-none whitespace-nowrap">
+          National Institute of Technology Calicut
+        </h1>
+        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+          Material Testing Laboratory
+        </p>
+      </div>
+    </div>
+
+    <div className="mt-3 flex items-center gap-3">
+      <div className="h-px flex-1 bg-slate-300" />
+      <h2 className="px-4 text-lg font-serif font-bold text-slate-900 text-center">
+        {title || "Test Report"}
+      </h2>
+      <div className="h-px flex-1 bg-slate-300" />
+    </div>
+  </header>
+);
+
+const ReportFooter = ({ pageNum, totalPages }) => (
+  <footer className="mt-auto pt-4 border-t-2 border-sky-100 flex justify-between items-center text-[10px] uppercase tracking-[0.2em] text-slate-400 shrink-0">
+    <span className="text-slate-500">NITC Material Testing Lab</span>
+    <span className="font-bold text-slate-600">
+      Page {pageNum} of {totalPages}
+    </span>
+  </footer>
+);
+
+const Page = ({ children }) => (
+  <div className="compstrength-print-fit relative w-full max-w-[210mm] min-h-[297mm] mx-auto bg-[linear-gradient(180deg,#f8fdff_0%,#ffffff_14%)] border-[5px] border-sky-200 shadow-[0_16px_50px_rgba(14,116,144,0.14)] mb-10 flex flex-col p-[20mm] box-border overflow-hidden print:shadow-none print:mb-0">
+    <div className="pointer-events-none absolute inset-0 border-[10px] border-white/70" />
+    <div className="pointer-events-none absolute left-0 top-0 h-20 w-20 rounded-br-[2.5rem] bg-sky-100/70" />
+    <div className="pointer-events-none absolute right-0 bottom-0 h-24 w-24 rounded-tl-[3rem] bg-teal-100/60" />
+    {children}
+  </div>
+);
 
 const ResultPage = ({ result, onRestart }) => {
 
@@ -46,67 +105,27 @@ const ResultPage = ({ result, onRestart }) => {
   };
 
   const theme = getStatusTheme();
-  const exactPrintColor = {
-    WebkitPrintColorAdjust: "exact",
-    printColorAdjust: "exact",
-  };
-
   return (
-    <div
-      className="min-h-screen bg-slate-50 pb-32 p-4 md:p-8 flex justify-center items-start font-sans print:min-h-0 print:pb-0 print:p-0 print:bg-white"
-      style={exactPrintColor}
-    >
-      {/* Main Report Card - Optimized for A4 Print */}
-      <div className="bg-white w-full max-w-[210mm] shadow-2xl rounded-xl  print:shadow-none print:w-full print:max-w-none print:rounded-none print:overflow-visible print:flex print:flex-col print:box-border print:min-h-[250mm]">
-        <div
-          className={`h-2 w-full rounded-t-xl ${theme.badge}`}
-          style={exactPrintColor}
-        />
+    <>
+      <style>{`
+        @media print {
+          @page { size: A4; margin: 0; }
+          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; }
+          html, body { overflow: visible; }
+          .compstrength-print-fit {
+            zoom: 0.96;
+          }
+        }
+      `}</style>
 
-        <div className="p-8 print:p-4 relative flex flex-col h-full print:flex-1">
-          {/* Header Section */}
-          <header className="flex flex-col items-center justify-center text-center border-b-2 border-slate-100 pb-3 mb-4">
-            <div className="flex items-center gap-4 mb-2">
-              {/* Logo Implementation */}
-              <div className="w-16 h-16 flex items-center justify-center overflow-hidden">
-                <img
-                  src={nitclogo}
-                  alt="NITC Logo"
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                    e.target.nextSibling.style.display = "flex";
-                  }}
-                />
-                <div
-                  style={{ display: "none" }}
-                  className="w-16 h-16 bg-slate-900 rounded-full items-center justify-center text-white"
-                >
-                  <span className="text-[8px] font-bold">NITC</span>
-                </div>
-              </div>
-
-              <div className="text-left">
-                <h1 className="text-2xl font-black text-slate-900 uppercase tracking-tight whitespace-nowrap leading-none">
-                  National Institute of Technology Calicut
-                </h1>
-                <div className="mt-1">
-                  <span className="inline-block px-3 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold uppercase tracking-[0.2em] ">
-                    Material Testing Laboratory
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <h2 className="text-xl font-serif font-bold text-slate-900 mt-1">
-              {result.name || "Test Report"}
-            </h2>
-          </header>
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#e0f2fe_0%,_#f8fafc_28%,_#eef2ff_100%)] py-10 px-4 flex flex-col font-sans print:py-0 print:px-0 print:bg-white">
+        <Page>
+          <ReportHeader title={result?.name || "Test Report"} />
+          <main className="flex-1 flex flex-col">
 
           {/* Meta Data Bar */}
           <div
-            className="flex flex-row justify-between items-center bg-slate-50 rounded-lg p-2.5 border border-slate-200 mb-4 print:bg-slate-100 "
-            style={exactPrintColor}
+            className="mb-4 flex flex-row justify-between items-center bg-white/85 rounded-2xl p-3 border border-slate-300"
           >
             <div className="flex gap-6 text-[10px]">
               <div className="flex items-center gap-2">
@@ -119,7 +138,7 @@ const ResultPage = ({ result, onRestart }) => {
             </div>
 
             <div
-              className={`px-2 py-0.5 rounded text-white text-[10px] font-bold uppercase tracking-wider ${theme.badge} print:border print:border-black print:text-black print:hidden`}
+              className={`px-2.5 py-1 rounded text-white text-[10px] font-bold uppercase tracking-wider print:hidden ${theme.badge}`}
             >
               Status: {result.status}
             </div>
@@ -172,12 +191,10 @@ const ResultPage = ({ result, onRestart }) => {
 
             <div
               className="overflow-hidden border border-slate-400 rounded-lg print:border-slate-400"
-              style={exactPrintColor}
             >
               <table className="w-full text-[10px] text-left">
                 <thead
                   className="bg-slate-100 text-slate-700 font-bold uppercase text-[9px] tracking-wider border-b border-slate-400 print:bg-slate-100"
-                  style={exactPrintColor}
                 >
                   <tr>
                     <th className="px-2 py-1.5 w-8 text-center border-r border-slate-400">
@@ -286,7 +303,7 @@ const ResultPage = ({ result, onRestart }) => {
           </section>
 
           {/* Conclusion & Remarks */}
-          <section className="flex flex-col flex-1 print:relative print:pb-20">
+          <section className="flex flex-col flex-1">
             <div className="mb-6">
               <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1 border-b border-slate-100 inline-block">
                 Remarks
@@ -300,29 +317,32 @@ const ResultPage = ({ result, onRestart }) => {
             </div>
 
             {/* Signature Block */}
-            <div className="grid grid-cols-2 gap-10 mt-8 pt-4 border-t border-slate-100 print:mt-0 print:pt-3 print:break-inside-avoid print:absolute print:bottom-0 print:left-0 print:right-0">
-              <div className="text-center">
-                <div className="h-10"></div>
-                <p className="font-black text-slate-900 text-[10px] uppercase">
+            <div className="mt-auto pt-10 pb-6">
+              <div className="grid grid-cols-2 gap-10">
+                <div className="text-center rounded-2xl border border-slate-200 bg-white/70 px-4 py-6">
+                  <div className="h-14 border-b border-dashed border-slate-400 w-48 mx-auto mb-3" />
+                  <p className="font-black text-slate-900 text-[11px] uppercase tracking-widest">
                   Tested By
-                </p>
-                <p className="text-[9px] text-slate-500 uppercase tracking-tighter">
-                  Lab Technician
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="h-10"></div>
-                <p className="font-black text-slate-900 text-[10px] uppercase">
+                  </p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">
+                    Lab Technician
+                  </p>
+                </div>
+                <div className="text-center rounded-2xl border border-slate-200 bg-white/70 px-4 py-6">
+                  <div className="h-14 border-b border-dashed border-slate-400 w-48 mx-auto mb-3" />
+                  <p className="font-black text-slate-900 text-[11px] uppercase tracking-widest">
                   Verified By
-                </p>
-                <p className="text-[9px] text-slate-500 uppercase tracking-tighter">
-                  Faculty In-charge
-                </p>
+                  </p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-1">
+                    Faculty In-charge
+                  </p>
+                </div>
               </div>
             </div>
           </section>
-        </div>
-      </div>
+          </main>
+          <ReportFooter pageNum={1} totalPages={1} />
+        </Page>
 
       {/* Action Bar */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-white p-2 rounded-2xl shadow-xl border border-slate-200 print:hidden">
@@ -341,7 +361,8 @@ const ResultPage = ({ result, onRestart }) => {
           <Printer size={16} /> Print Report
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
